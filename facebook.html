@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FoT8I4F9NfR+qxTgcQyC5JkhoyhdQOXzoGJyMJRDKjI='; style-src 'sha256-OgmDx9Ss8fGKyAYquermeR30zYrdCtMQjI/NtSJppqY='; base-uri 'none'; form-action 'none'"><title>Conectar Facebook · AlunIA</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f8f3;color:#173f35;font:17px/1.65 system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:24px}main{width:min(600px,100%);background:white;border:1px solid #dce6dd;border-radius:24px;padding:46px;box-shadow:0 20px 70px #163f350a}small{letter-spacing:2px;color:#648376;font-size:11px;font-weight:700}h1{font-size:32px;line-height:1.2;margin:22px 0}p{color:#61796d}a{display:inline-block;border-radius:12px;background:#146c5b;color:white;padding:13px 20px;text-decoration:none;font-weight:600}a[hidden]{display:none}.note{font-size:12px;margin-top:30px}</style></head>
+<body><main><small>ALUNIA · SOCIAL STUDIO</small><h1>Sua conexão está a caminho.</h1><p id="status">Validando o retorno da autorização do Facebook…</p><a id="return" hidden>Voltar ao aplicativo</a><p class="note">Esta página encaminha a autorização ao seu computador. Nenhum vídeo é publicado aqui. A senha, o token e a chave secreta do aplicativo não ficam nesta página.</p></main><script>// Public static relay only. Tokens and the Instagram App Secret stay in Studio.
+(() => {
+  const status = document.getElementById('status');
+  const button = document.getElementById('return');
+  const query = new URLSearchParams(location.search);
+  const state = query.get('state') || '';
+  const code = query.get('code') || '';
+  const error = query.get('error') || '';
+  const repeated = ['state', 'code', 'error'].some(key => query.getAll(key).length > 1);
+  if (repeated || !/^[A-Za-z0-9_-]{32,128}$/.test(state) || (!code && !error) || (code && error) || code.length > 4096 || error.length > 256) {
+    status.textContent = 'Abra Conectar Facebook no AlunIA Social Studio para iniciar a autorização.';
+    return;
+  }
+  const target = new URL('http://127.0.0.1:8765/oauth/facebook/callback');
+  target.searchParams.set('state', state);
+  if (code) target.searchParams.set('code', code);
+  else target.searchParams.set('error', error);
+  // Never carry arbitrary redirect destinations or credentials to another host.
+  history.replaceState(null, '', location.pathname);
+  button.href = target.href;
+  button.hidden = false;
+  status.textContent = 'Voltando ao aplicativo neste computador. Mantenha o servidor do AlunIA aberto.';
+  setTimeout(() => location.replace(target.href), 300);
+})();</script></body></html>
